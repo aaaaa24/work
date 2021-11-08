@@ -10,10 +10,10 @@ try{
   $sql = "SELECT * FROM users limit 20";  //SQLの準備
   $stmt = $dbh->query($sql);  //SQLの実行
   // var_dump($result);
-  foreach($stmt as $column){
-    echo 'ID:'.$column['id'].' => ユーザーID:'.$column['user_id'];
-    echo '<br>';
-  }
+    foreach($stmt as $column){
+      echo 'ID:'.$column['id'].' => ユーザーID:'.$column['user_id'];
+      echo '<br>';
+    }
 }catch(PDOException $e){
   echo '接続失敗'. $e->getMessage();
   exit;
@@ -47,4 +47,4 @@ function getResult($id){
 getResult(2);
 echo '<br>';
 getResult(10);
-?>
+

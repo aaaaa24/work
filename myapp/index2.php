@@ -62,7 +62,7 @@ try {
   $result = $stmt_l->fetch();
   if(empty($result)){
     foreach($large_area as $key_2 => $val_2) {
-      $sql = "INSERT INTO large_area (name,prefecture_name,prefecture_id) VALUES (:name,:prefecture_name,:prefecture_id)";
+      $sql = "INSERT INTO large_area (name,prefecture_name,prefecture_id,create_timestamp,update_timestamp) VALUES (:name,:prefecture_name,:prefecture_id,now(),now())";
       $stmt = $dbh->prepare($sql);
       $stmt->bindValue(':name',$val_2[0],PDO::PARAM_STR);
       $stmt->bindValue(':prefecture_name',$val_2[1],PDO::PARAM_STR);
@@ -96,12 +96,17 @@ try {
     [
       PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC //フェッチモード変える
     ]);
-  foreach($prefecture as $key_5 => $val_5){
-    $sql = "INSERT INTO prefecture (prefecture_id,name) VALUES (:prefecture_id,:name)";
-    $stmt = $dbh->prepare($sql);
-    $stmt->bindValue(':prefecture_id',$val_5[0],PDO::PARAM_STR);
-    $stmt->bindValue(':name',$val_5[1],PDO::PARAM_STR);
-    $stmt->execute();
+  $sql_p = "SELECT * FROM prefecture";
+  $stmt_p = $dbh->query($sql_p);
+  $result = $stmt_p->fetch();
+  if(empty($result)){
+    foreach($prefecture as $key_5 => $val_5){
+      $sql = "INSERT INTO prefecture (prefecture_id,name,create_timestamp,update_timestamp) VALUES (:prefecture_id,:name,NOW(),NOW())";
+      $stmt = $dbh->prepare($sql);
+      $stmt->bindValue(':prefecture_id',$val_5[0],PDO::PARAM_STR);
+      $stmt->bindValue(':name',$val_5[1],PDO::PARAM_STR);
+      $stmt->execute();
+    }
   }
   echo 'INSERTできました';
 } catch (PDOException $e) {
@@ -137,12 +142,17 @@ try {
     [
       PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC //フェッチモード変える
     ]);
-  foreach($city as $key_9 => $val_9){
-    $sql = "INSERT INTO city (name,citycode) VALUES (:name,:citycode)";
-    $stmt = $dbh->prepare($sql);
-    $stmt->bindValue(':name',$val_9[0],PDO::PARAM_STR);
-    $stmt->bindValue(':citycode',$val_9[1],PDO::PARAM_STR);
-    $stmt->execute();
+  $sql_c = "SELECT * FROM city";
+  $stmt_c = $dbh->query($sql_c);
+  $result = $stmt_c->fetch();
+  if(empty($result)){
+    foreach($city as $key_9 => $val_9){
+      $sql = "INSERT INTO city (name,citycode,create_timestamp,update_timestamp) VALUES (:name,:citycode,NOW(),NOW())";
+      $stmt = $dbh->prepare($sql);
+      $stmt->bindValue(':name',$val_9[0],PDO::PARAM_STR);
+      $stmt->bindValue(':citycode',$val_9[1],PDO::PARAM_STR);
+      $stmt->execute();
+    }
   }
   echo 'INSERTできました';
 } catch (PDOException $e) {
@@ -170,3 +180,24 @@ try {
 }
 
 //Lesson12_3_4 県ごとの区の数を表示する
+try {
+  $dbh = new PDO($dsn,$user,$pass);
+  $sql = "SELECT * FROM prefecture";
+  $stmt = $dbh->query($sql);
+  $num1 = 10001;
+  $num2 = 19999;
+  foreach($stmt as $p) {
+    $sql1 = "SELECT COUNT(*) AS num FROM city WHERE $num1 <= citycode && $num2 >= citycode";
+    $stmt1 = $dbh->query($sql1);
+    $result = $stmt1->fetch(PDO::FETCH_ASSOC);
+    echo '<br>';
+    echo "{$p['name']}は区の数が{$result['num']}個ある";
+    $num1 += 10000;
+    $num2 += 10000;
+  }
+} catch(PDOException $e){
+  echo 'データベースに接続できません' . $e->getMessage();
+  exit;
+}
+
+?>
